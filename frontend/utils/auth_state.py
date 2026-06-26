@@ -53,7 +53,7 @@ def require_auth():
     init_session_state()
     if not is_logged_in():
         st.warning("You need to log in to access this page.")
-        st.page_link("pages/1_Login.py", label="Go to login")
+        link_button("Go to login", "pages/1_Login.py")
         st.stop()
 
 def get_client() -> SIPApiClient:
@@ -64,3 +64,37 @@ def get_client() -> SIPApiClient:
         # Return unauthenticated client if not logged in
         return SIPApiClient(base_url=API_URL)
     return st.session_state.api_client
+
+def nav_to(page_name: str):
+    """
+    Programmatic navigation helper for Streamlit 1.28.2.
+    """
+    if page_name in ["app.py", "Home", "/"]:
+        url = "/"
+    else:
+        clean_name = page_name.split("/")[-1].replace(".py", "")
+        if "_" in clean_name and clean_name.split("_")[0].isdigit():
+            clean_name = "_".join(clean_name.split("_")[1:])
+        url = f"/{clean_name}"
+    
+    js = f"""
+    <script type="text/javascript">
+        window.parent.location.href = "{url}";
+    </script>
+    """
+    st.markdown(js, unsafe_allow_html=True)
+
+def link_button(label: str, page_name: str, icon: str = ""):
+    """
+    Standard anchor link formatted as a button for Streamlit 1.28.2.
+    """
+    if page_name in ["app.py", "Home", "/"]:
+        url = "/"
+    else:
+        clean_name = page_name.split("/")[-1].replace(".py", "")
+        if "_" in clean_name and clean_name.split("_")[0].isdigit():
+            clean_name = "_".join(clean_name.split("_")[1:])
+        url = f"/{clean_name}"
+    
+    icon_str = f"{icon} " if icon else ""
+    st.markdown(f'<a href="{url}" target="_self" style="text-decoration:none;"><button style="align-items: center; justify-content: center; background-color: rgb(255, 255, 255); border: 1px solid rgb(230, 234, 241); border-radius: 4px; color: rgb(49, 51, 63); display: inline-flex; font-size: 14px; font-weight: 400; padding: 0.25rem 0.75rem; text-decoration: none; cursor: pointer;">{icon_str}{label}</button></a>', unsafe_allow_html=True)

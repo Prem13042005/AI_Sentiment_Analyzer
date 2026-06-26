@@ -2,7 +2,8 @@ FROM python:3.10-slim
 WORKDIR /app
 RUN apt-get update && apt-get install -y build-essential libpq-dev curl && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
-RUN pip install --no-cache-dir fastapi uvicorn pydantic sqlalchemy psycopg2-binary python-multipart python-dotenv python-jose passlib bcrypt alembic requests
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir tensorflow-cpu==2.13.0 --no-deps
 COPY backend/ ./backend/
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl -f http://localhost:8000/health || exit 1

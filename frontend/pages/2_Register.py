@@ -1,6 +1,6 @@
 import streamlit as st
 import re
-from frontend.utils.auth_state import init_session_state, is_logged_in, get_client
+from frontend.utils.auth_state import init_session_state, is_logged_in, get_client, nav_to, link_button
 
 # Page configurations
 st.set_page_config(page_title="Register — SIP", page_icon="📝")
@@ -10,7 +10,7 @@ init_session_state()
 
 # Redirect to dashboard if already authenticated
 if is_logged_in():
-    st.switch_page("pages/3_Dashboard.py")
+    nav_to("pages/3_Dashboard.py")
 
 # Centering layout
 _, col_mid, _ = st.columns([1, 2, 1])
@@ -56,9 +56,9 @@ with col_mid:
                 client = get_client()
                 client.register(username=username_clean, email=email_clean, password=password)
                 st.success("Account created successfully! Please log in.")
-                st.switch_page("pages/1_Login.py")
+                nav_to("pages/1_Login.py")
             except Exception as e:
                 st.error(str(e))
                 
     st.divider()
-    st.page_link("pages/1_Login.py", label="Already have an account? Sign in →")
+    link_button("Already have an account? Sign in →", "pages/1_Login.py")

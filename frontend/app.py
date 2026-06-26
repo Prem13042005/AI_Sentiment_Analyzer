@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import pandas as pd
-from frontend.utils.auth_state import init_session_state, is_logged_in
+from frontend.utils.auth_state import init_session_state, is_logged_in, link_button
 
 # Page configuration
 st.set_page_config(
@@ -26,7 +26,7 @@ init_session_state()
 # Navigation helper for logged-in operators
 if is_logged_in():
     st.info(f"Authenticated as {st.session_state.username}")
-    st.page_link("pages/3_Dashboard.py", label="Go to Dashboard →", icon="📊")
+    link_button("Go to Dashboard →", "pages/3_Dashboard.py", icon="📊")
     st.divider()
 
 # Hero Section
@@ -40,9 +40,9 @@ st.markdown("""
 # Call to Action Links
 col_cta1, col_cta2, _ = st.columns([1.5, 1.5, 7])
 with col_cta1:
-    st.page_link("pages/1_Login.py", label="Get started", icon="🔐")
+    link_button("Get started", "pages/1_Login.py", icon="🔐")
 with col_cta2:
-    st.page_link("pages/4_Analyzer.py", label="Try demo", icon="🔍")
+    link_button("Try demo", "pages/4_Analyzer.py", icon="🔍")
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.divider()

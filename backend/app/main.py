@@ -4,6 +4,8 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 from backend.app.database import get_db, init_db
 from backend.app.middleware.logger import RequestLoggingMiddleware
@@ -14,10 +16,6 @@ from backend.app.routers.history_router import router as history_router
 from backend.app.utils.model_registry import ModelRegistry
 from backend.app.services.model_service import ModelService
 from backend.app.services.db_service import DatabaseService
-
-# Load Env config
-from dotenv import load_dotenv
-load_dotenv()
 
 app = FastAPI(
     title="Sentiment Intelligence Platform API",

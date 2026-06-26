@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-from frontend.utils.auth_state import require_auth, do_logout, get_client
+from frontend.utils.auth_state import require_auth, do_logout, get_client, link_button
 from frontend.utils.charts import sentiment_bar_chart, activity_line_chart
 
 # Page configuration and authentication check
@@ -86,7 +86,7 @@ st.subheader("Recent Analyses")
 
 if not history:
     st.info("No analyses yet. Go to the Analyzer to get started.")
-    st.page_link("pages/4_Analyzer.py", label="Run single analysis →", icon="🔍")
+    link_button("Run single analysis →", "pages/4_Analyzer.py", icon="🔍")
 else:
     df_history = pd.DataFrame(history)
     df_recent = df_history.head(10).copy()

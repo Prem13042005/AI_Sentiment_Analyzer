@@ -7,6 +7,8 @@ services:
     container_name: sip_backend
     ports: ["8000:8000"]
     env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
       - ./models:/app/models
       - ./mlruns:/app/mlruns
@@ -32,7 +34,7 @@ services:
     image: postgres:15-alpine
     container_name: sip_db
     env_file: .env
-    ports: ["5432:5432"]
+    ports: ["5433:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
