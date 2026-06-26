@@ -1,59 +1,46 @@
 version: '3.8'
-
 services:
-  # FastAPI REST API Backend
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: sentiment_backend
-    ports:
-      - "8000:8000"
-    environment:
-      - ENV=production
-      - LOG_LEVEL=INFO
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sentiment_db
-      - MLFLOW_TRACKING_URI=/app/mlruns
+      dockerfile: Dockerfile.backend
+    container_name: sip_backend
+    ports: ["8000:8000"]
+    env_file: .env
     volumes:
       - ./models:/app/models
       - ./mlruns:/app/mlruns
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
 
-  # Streamlit Client Interface
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: sentiment_frontend
-    command: streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0
-    ports:
-      - "8501:8501"
+      dockerfile: Dockerfile.frontend
+    container_name: sip_frontend
+    ports: ["8501:8501"]
+    env_file: .env
     environment:
       - API_URL=http://backend:8000
-    volumes:
-      - ./models:/app/models
     depends_on:
       - backend
+    restart: unless-stopped
 
-  # Relational Database Storage
   db:
     image: postgres:15-alpine
-    container_name: sentiment_db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=sentiment_db
+    container_name: sip_db
+    env_file: .env
+    ports: ["5432:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d sentiment_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:

@@ -1,11 +1,17 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 import os
-from backend.app.database.connection import get_db, init_db
+
+from backend.app.database import get_db, init_db
 from backend.app.middleware.logger import RequestLoggingMiddleware
 from backend.app.routers import predict, explain, analytics
+from backend.app.routers.auth_router import router as auth_router
+from backend.app.routers.predict_router import router as predict_router
+from backend.app.routers.history_router import router as history_router
+from backend.app.utils.model_registry import ModelRegistry
 from backend.app.services.model_service import ModelService
 from backend.app.services.db_service import DatabaseService
 
@@ -22,7 +28,7 @@ app = FastAPI(
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, configure to specific domains
+    allow_origins=["http://localhost:8501", "http://frontend:8501"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,10 +37,29 @@ app.add_middleware(
 # Custom logger middleware for process latency auditing
 app.add_middleware(RequestLoggingMiddleware)
 
-# Include API Routers
+# Register new routers
+app.include_router(auth_router)
+app.include_router(predict_router)
+app.include_router(history_router)
+
+# Include legacy API Routers
 app.include_router(predict.router)
 app.include_router(explain.router)
 app.include_router(analytics.router)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"}
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()}
+    )
 
 @app.on_event("startup")
 def startup_event():
@@ -47,7 +72,11 @@ def startup_event():
     # Initialize DB (creates SQLite/PostgreSQL schemas)
     init_db()
     
-    # Pre-load/verify models in memory
+    # Initialize ModelRegistry singleton and load models
+    model_dir = os.getenv("MODEL_DIR", "./models")
+    ModelRegistry.get_instance().load_models(model_dir)
+    
+    # Pre-load/verify legacy ModelService
     print("FastAPI: Initializing ModelService...")
     model_service = ModelService()
     
@@ -62,37 +91,17 @@ def startup_event():
         
     print("FastAPI: Startup sequence complete. Server ready.")
 
-@app.get("/", include_in_schema=False)
-def root_redirect():
-    """
-    Redirects API root request to interactive Swagger documentation.
-    """
-    return RedirectResponse(url="/docs")
-
 @app.get("/health", tags=["System Health"])
-def check_health(db: Session = Depends(get_db)):
+def check_health():
     """
     Performs system health check of model loader and database connection.
     """
-    db_status = "Healthy"
-    try:
-        # Quick db query to verify link
-        db.execute(type("Query", (object,), {"__str__": lambda s: "SELECT 1"})())
-    except Exception:
-        db_status = "Unhealthy"
-        
-    # Check loaded models
-    model_service = ModelService()
-    model_status = {
-        name: ("Loaded" if name in model_service.models else "Not Loaded / Dynamic Fallback")
-        for name in ["bilstm", "gru_attention", "cnn_lstm", "distilbert"]
-    }
-    
-    overall_status = "Healthy" if db_status == "Healthy" else "Degraded"
-    
     return {
-        "status": overall_status,
-        "database": db_status,
-        "models": model_status,
-        "environment": os.getenv("ENV", "production")
+        "status": "ok",
+        "models_ready": ModelRegistry.get_instance().is_ready(),
+        "version": "1.0.0"
     }
+
+@app.get("/")
+def read_root():
+    return {"message": "SIP API running. Docs at /docs"}

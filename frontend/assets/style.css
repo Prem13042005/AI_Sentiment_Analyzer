@@ -1,0 +1,84 @@
+/* Hide Streamlit chrome decoration elements */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Sentiment badge pills */
+.badge-positive {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-block;
+}
+.badge-negative {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-block;
+}
+.badge-neutral {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-block;
+}
+
+/* Metric card overrides */
+[data-testid="metric-container"] {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Hero section alignment */
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #111827;
+}
+.hero-sub {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+/* LIME token highlight attributions */
+.lime-pos {
+    background: #bbf7d0;
+    border-radius: 3px;
+    padding: 1px 3px;
+    font-weight: 500;
+    color: #14532d;
+    display: inline-block;
+    margin: 2px;
+}
+.lime-neg {
+    background: #fecaca;
+    border-radius: 3px;
+    padding: 1px 3px;
+    font-weight: 500;
+    color: #7f1d1d;
+    display: inline-block;
+    margin: 2px;
+}
+
+/* Feature grid layout blocks */
+.feature-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    height: 100%;
+}
