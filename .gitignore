@@ -1,0 +1,62 @@
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment Variables
+.env
+
+# ===========================
+# ML Models
+# ===========================
+models/
+*.h5
+*.keras
+*.pb
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+*.pickle
+*.joblib
+
+# TensorFlow
+checkpoint
+saved_model/
+
+# ===========================
+# Database
+# ===========================
+*.db
+*.sqlite3
+
+# ===========================
+# Cache
+# ===========================
+.pytest_cache/
+.cache/
+
+# ===========================
+# IDE
+# ===========================
+.vscode/
+.idea/
+
+# ===========================
+# OS
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# Logs
+# ===========================
+*.log
