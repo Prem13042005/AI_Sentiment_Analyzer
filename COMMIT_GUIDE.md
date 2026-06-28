@@ -1,6 +1,6 @@
 # Sentiment Intelligence Platform (SIP) - Git Commit Guide
 
-This guide provides a step-by-step procedure to reconstruct the commit history of the Sentiment Intelligence Platform (SIP) codebase into 12 logical, production-grade commits. 
+This guide provides a step-by-step procedure to reconstruct the commit history of the Sentiment Intelligence Platform (SIP) codebase into 12 logical, production-grade commits matching the React and FastAPI architecture.
 
 Before starting, initialize a new git repository in the workspace root:
 ```bash
@@ -22,12 +22,12 @@ git init
 
 ### Commit 2: Core Database Setup & Validation Schemas
 * **Files**: 
-  * `backend/app/database/__init__.py`
-  * `backend/app/schemas/__init__.py`
+  * `backend/app/database.py`
+  * `backend/app/schemas.py`
 * **Purpose**: Establish validation schemas and create connection pooling.
 * **Commands**:
   ```bash
-  git add backend/app/database/__init__.py backend/app/schemas/__init__.py
+  git add backend/app/database.py backend/app/schemas.py
   git commit -m "feat(backend): configure SQLAlchemy connection pool and define Pydantic v2 schemas"
   ```
 
@@ -59,19 +59,14 @@ git init
 
 ---
 
-### Commit 5: Deep Learning Registry & Inferences
+### Commit 5: HuggingFace Inferences & Predictions Router
 * **Files**:
-  * `backend/app/utils/model_registry.py`
-  * `backend/app/utils/preprocess.py`
-  * `backend/app/utils/lime_explain.py`
-  * `backend/app/utils/train_models.py`
-  * `backend/app/utils/mlflow_tracker.py`
   * `backend/app/routers/predict_router.py`
-* **Purpose**: Build singleton model loader and predict routers with LIME interpretability support.
+* **Purpose**: Build DistilBERT prediction pipeline and single/bulk endpoints.
 * **Commands**:
   ```bash
-  git add backend/app/utils/model_registry.py backend/app/utils/preprocess.py backend/app/utils/lime_explain.py backend/app/utils/train_models.py backend/app/utils/mlflow_tracker.py backend/app/routers/predict_router.py
-  git commit -m "feat(backend): build Singleton ModelRegistry and integrate predict routes with LIME attributions"
+  git add backend/app/routers/predict_router.py
+  git commit -m "feat(backend): integrate HuggingFace pipelines with single and bulk prediction routers"
   ```
 
 ---
@@ -79,69 +74,68 @@ git init
 ### Commit 6: History Audit & App Gateway Startup
 * **Files**:
   * `backend/app/routers/history_router.py`
-  * `backend/app/middleware/logger.py`
   * `backend/app/main.py`
 * **Purpose**: Construct history log endpoints and wire routers to the main entrypoint.
 * **Commands**:
   ```bash
-  git add backend/app/routers/history_router.py backend/app/middleware/logger.py backend/app/main.py
+  git add backend/app/routers/history_router.py backend/app/main.py
   git commit -m "feat(backend): build history audit trail endpoints, aggregated metrics and mount main app routers"
   ```
 
 ---
 
-### Commit 7: Frontend Landing & Stylesheet Customizations
+### Commit 7: Frontend Baseline & Stylesheet Customizations
 * **Files**:
-  * `frontend/app.py`
-  * `frontend/assets/style.css`
-* **Purpose**: Create landing view and establish layout themes.
+  * `frontend/package.json`
+  * `frontend/vite.config.js`
+  * `frontend/tailwind.config.js`
+  * `frontend/src/index.css`
+* **Purpose**: Configure npm package descriptors, Tailwind CSS styling, and Vite project structure.
 * **Commands**:
   ```bash
-  git add frontend/app.py frontend/assets/style.css
-  git commit -m "feat(frontend): create main Streamlit landing page layout and inject custom CSS theme styles"
+  git add frontend/package.json frontend/vite.config.js frontend/tailwind.config.js frontend/src/index.css
+  git commit -m "feat(frontend): configure package definitions, tailwind classes, and baseline build setup"
   ```
 
 ---
 
-### Commit 8: Frontend Session State & User Gateways
+### Commit 8: API Client and Authorization Context
 * **Files**:
-  * `frontend/utils/api_client.py`
-  * `frontend/utils/auth_state.py`
-  * `frontend/pages/1_Login.py`
-  * `frontend/pages/2_Register.py`
-* **Purpose**: Establish API client library and auth screens.
+  * `frontend/src/services/api.js`
+  * `frontend/src/context/AuthContext.jsx`
+  * `frontend/src/components/ProtectedRoute.jsx`
+* **Purpose**: Build Axios REST clients, request interceptors, and protected auth wrappers.
 * **Commands**:
   ```bash
-  git add frontend/utils/api_client.py frontend/utils/auth_state.py frontend/pages/1_Login.py frontend/pages/2_Register.py
-  git commit -m "feat(frontend): implement API client, state manager, and build Login/Register screens"
+  git add frontend/src/services/api.js frontend/src/context/AuthContext.jsx frontend/src/components/ProtectedRoute.jsx
+  git commit -m "feat(frontend): develop axios API client, authentication contexts, and protected route handlers"
   ```
 
 ---
 
-### Commit 9: Dashboard Reports & Real-Time Classifier views
+### Commit 9: User Registration, Login & Google Chooser
 * **Files**:
-  * `frontend/utils/charts.py`
-  * `frontend/pages/3_Dashboard.py`
-  * `frontend/pages/4_Analyzer.py`
-* **Purpose**: Integrate Plotly charting widgets, dashboard screens, and model analyzers.
+  * `frontend/src/pages/Login.jsx`
+  * `frontend/src/pages/Register.jsx`
+* **Purpose**: Implement secure credential validation forms and persistent Google Account Chooser popups.
 * **Commands**:
   ```bash
-  git add frontend/utils/charts.py frontend/pages/3_Dashboard.py frontend/pages/4_Analyzer.py
-  git commit -m "feat(frontend): integrate Plotly visualization utils, metrics dashboard and model analyzer"
+  git add frontend/src/pages/Login.jsx frontend/src/pages/Register.jsx
+  git commit -m "feat(frontend): build user login/register pages and implement browser-persistent Google Account Chooser"
   ```
 
 ---
 
-### Commit 10: Run Logs Audit & Bulk Dataset Annotation Tools
+### Commit 10: Interactive Dashboard, Analyzer & Logs Pages
 * **Files**:
-  * `frontend/pages/5_History.py`
-  * `frontend/pages/6_Bulk_Upload.py`
-  * `frontend/pages/7_About.py`
-* **Purpose**: Develop bulk CSV processors, log managers, and repository about pages.
+  * `frontend/src/pages/Dashboard.jsx`
+  * `frontend/src/pages/Analyzer.jsx`
+  * `frontend/src/pages/History.jsx`
+* **Purpose**: Integrate Plotly charting widgets, analyzer inputs, attributions, and pagination tables.
 * **Commands**:
   ```bash
-  git add frontend/pages/5_History.py frontend/pages/6_Bulk_Upload.py frontend/pages/7_About.py
-  git commit -m "feat(frontend): create logs audit manager, bulk CSV annotation uploader and info page"
+  git add frontend/src/pages/Dashboard.jsx frontend/src/pages/Analyzer.jsx frontend/src/pages/History.jsx
+  git commit -m "feat(frontend): construct metric charts, text analyzer views, and historical logs table"
   ```
 
 ---

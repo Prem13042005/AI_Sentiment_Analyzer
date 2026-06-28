@@ -1,37 +1,30 @@
 import pytest
-from unittest.mock import patch
-from backend.app.utils.model_registry import ModelRegistry
+from unittest.mock import patch, MagicMock
 
 @pytest.fixture(autouse=True)
-def mock_model_inference():
+def mock_huggingface_pipeline():
     """
-    Mocks ModelRegistry inference methods to ensure deterministic tests
-    without requiring physical deep learning model files on disk.
+    Mocks get_pipeline inside predict_router to return a callable mock pipeline
+    so that tests run without invoking the real model or downloading weights.
     """
-    def mock_predict_ensemble(text: str):
+    mock_nlp = MagicMock()
+    
+    def mock_pipeline_call(text, *args, **kwargs):
         clean = text.lower()
         if "love" in clean or "like" in clean or "great" in clean:
-            sentiment = "positive"
-            confidence = 0.98
+            label = "POSITIVE"
+            score = 0.98
         elif "terrible" in clean or "waste" in clean or "poor" in clean:
-            sentiment = "negative"
-            confidence = 0.95
+            label = "NEGATIVE"
+            score = 0.95
         else:
-            sentiment = "neutral"
-            confidence = 0.50
-            
-        return {
-            "sentiment": sentiment,
-            "confidence": confidence,
-            "model_scores": [
-                {"model_name": "bilstm", "sentiment": sentiment, "confidence": confidence},
-                {"model_name": "gru", "sentiment": sentiment, "confidence": confidence},
-                {"model_name": "cnn_lstm", "sentiment": sentiment, "confidence": confidence},
-                {"model_name": "distilbert", "sentiment": sentiment, "confidence": confidence}
-            ]
-        }
-
-    with patch.object(ModelRegistry, "predict_ensemble", side_effect=mock_predict_ensemble):
+            label = "POSITIVE"
+            score = 0.50  # resolves to neutral since score < 0.65
+        return [{"label": label, "score": score}]
+        
+    mock_nlp.side_effect = mock_pipeline_call
+    
+    with patch("backend.app.routers.predict_router.get_pipeline", return_value=mock_nlp):
         yield
 
 def test_predict_positive_text(client, auth_headers):

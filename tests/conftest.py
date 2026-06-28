@@ -10,7 +10,7 @@ def _patched_hashpw(password, salt):
 bcrypt.hashpw = _patched_hashpw
 
 import sys
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 
 # Pre-mock heavy machine learning libraries to bypass local environment import issues
 sys.modules['tensorflow'] = MagicMock()
@@ -32,16 +32,35 @@ from backend.app.main import app
 from backend.app.database import init_db
 
 @pytest.fixture(scope="session", autouse=True)
+def mock_huggingface_pipeline():
+    """
+    Globally mock the transformers pipeline inside predict_router for all tests.
+    """
+    mock_nlp = MagicMock()
+    def mock_pipeline_call(text, *args, **kwargs):
+        clean = text.lower()
+        if "love" in clean or "like" in clean or "great" in clean:
+            label = "POSITIVE"
+            score = 0.98
+        elif "terrible" in clean or "waste" in clean or "poor" in clean:
+            label = "NEGATIVE"
+            score = 0.95
+        else:
+            label = "POSITIVE"
+            score = 0.50
+        return [{"label": label, "score": score}]
+    mock_nlp.side_effect = mock_pipeline_call
+    
+    with patch("backend.app.routers.predict_router.get_pipeline", return_value=mock_nlp):
+        yield
+
+@pytest.fixture(scope="session", autouse=True)
 def setup_test_database():
     """
     Initializes database tables on test session startup.
     Since it uses SQLite in-memory, the schema automatically persists across all session tests.
     """
     init_db()
-    # Preload mock distilbert model or check registry config
-    from backend.app.utils.model_registry import ModelRegistry
-    # Force mock DistilBERT loading inside registry if missing
-    ModelRegistry.get_instance()._ready = True
     yield
 
 @pytest.fixture(scope="module")

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from backend.app.database.connection import get_db
+from backend.app.database import get_db
 from backend.app.schemas.predict import PredictRequest, PredictResponse, BulkPredictRequest, BulkPredictResponse
 from backend.app.services.model_service import ModelService
 from backend.app.services.db_service import DatabaseService

@@ -1,17 +1,29 @@
 version: '3.8'
+
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: sentix_db
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    container_name: sip_backend
-    ports: ["8000:8000"]
-    env_file: .env
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-    volumes:
-      - ./models:/app/models
-      - ./mlruns:/app/mlruns
+    container_name: sentix_backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -21,27 +33,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    container_name: sip_frontend
-    ports: ["8501:8501"]
-    env_file: .env
-    environment:
-      - API_URL=http://backend:8000
+    container_name: sentix_frontend
+    ports:
+      - "80:80"
+    env_file:
+      - .env
     depends_on:
       - backend
-    restart: unless-stopped
-
-  db:
-    image: postgres:15-alpine
-    container_name: sip_db
-    env_file: .env
-    ports: ["5433:5432"]
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
 volumes:

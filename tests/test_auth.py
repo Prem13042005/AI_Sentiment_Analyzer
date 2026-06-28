@@ -81,7 +81,7 @@ def test_login_wrong_password(client, test_user):
     }
     response = client.post("/api/v1/auth/login", data=payload)
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid credentials"
+    assert response.json()["detail"] == "Invalid username or password"
 
 def test_login_nonexistent_user(client):
     """
@@ -93,7 +93,7 @@ def test_login_nonexistent_user(client):
     }
     response = client.post("/api/v1/auth/login", data=payload)
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid credentials"
+    assert response.json()["detail"] == "Invalid username or password"
 
 def test_me_with_valid_token(client, test_user, auth_headers):
     """
